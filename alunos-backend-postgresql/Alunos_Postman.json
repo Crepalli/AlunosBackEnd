@@ -1,0 +1,368 @@
+{
+  "info": {
+    "name": "Trabalho II - Alunos PostgreSQL",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "alunoId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - Cadastrar SEM ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/gravar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "gravar"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"João Crepalli\",\n  \"email\": \"joao.crepalli@unipar.br\",\n  \"cursos\": [\n    {\n      \"id\": 1\n    },\n    {\n      \"id\": 3\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "2 - Listar e guardar o ID do último cadastro",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/listar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "listar"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const alunos = pm.response.json().filter(a => a.email === \"joao.crepalli@unipar.br\");",
+              "pm.test(\"Cadastro encontrado\", () => pm.expect(alunos.length).to.be.above(0));",
+              "if (alunos.length) pm.collectionVariables.set(\"alunoId\", String(Math.max(...alunos.map(a => a.id))));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 - Buscar por ID (REPETIR após reiniciar)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/listar/{{alunoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "listar",
+            "{{alunoId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Registro permanece disponível\", () => {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(pm.response.json().id).to.eql(Number(pm.collectionVariables.get(\"alunoId\")));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Filtrar - Nome",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?nome=joão",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "nome",
+              "value": "joão"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - E-mail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?email=unipar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "email",
+              "value": "unipar"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - Curso",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?nomeCurso=banco de dados",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "nomeCurso",
+              "value": "banco de dados"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - Nome + e-mail",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?nome=joão&email=unipar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "nome",
+              "value": "joão"
+            },
+            {
+              "key": "email",
+              "value": "unipar"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - Nome + curso",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?nome=joão&nomeCurso=banco",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "nome",
+              "value": "joão"
+            },
+            {
+              "key": "nomeCurso",
+              "value": "banco"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - E-mail + curso",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?email=unipar&nomeCurso=banco",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "email",
+              "value": "unipar"
+            },
+            {
+              "key": "nomeCurso",
+              "value": "banco"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - Três filtros",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar?nome=joão&email=unipar&nomeCurso=banco",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ],
+          "query": [
+            {
+              "key": "nome",
+              "value": "joão"
+            },
+            {
+              "key": "email",
+              "value": "unipar"
+            },
+            {
+              "key": "nomeCurso",
+              "value": "banco"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Filtrar - Sem filtros",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/filtrar",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "filtrar"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4 - Atualizar (após comprovar persistência)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/editar/{{alunoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "editar",
+            "{{alunoId}}"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"João Sérgio Crepalli\",\n  \"email\": \"joao.crepalli@unipar.br\",\n  \"cursos\": [\n    {\n      \"id\": 2\n    }\n  ]\n}"
+        }
+      }
+    },
+    {
+      "name": "5 - Excluir (somente no final)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/deletar/{{alunoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "deletar",
+            "{{alunoId}}"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6 - Confirmar exclusão (esperado 404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/aluno/listar/{{alunoId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "aluno",
+            "listar",
+            "{{alunoId}}"
+          ]
+        }
+      }
+    }
+  ]
+}
